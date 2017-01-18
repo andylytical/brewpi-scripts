@@ -1,6 +1,3 @@
-# brewpi-scripts
-Useful scripts for setting up brewpi and tiltHydrometer
-
 # Building a new brewpi from scratch
 ## Install Raspbian image on SD card
 1. Download Raspbian Jessie Lite (https://www.raspberrypi.org/downloads/raspbian/)
