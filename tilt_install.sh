@@ -72,7 +72,7 @@ copy_files $BREWOMETER_BASE/brewpi-script $BREWPI_HOME
 
 # Setup Tilt calibration files
 tiltdir=$( 
-    find $BREWPI_HOME -type f -name 'TEMPERATURE.colour' -printf '%h\n' \
+    find $BREWPI_HOME -type f -name 'TEMPERATURE.colour' -printf '%h' \
     | head -1 )
 for color in "${TILT_COLORS[@]}"; do
     for pfx in TEMPERATURE GRAVITY; do
@@ -83,18 +83,21 @@ for color in "${TILT_COLORS[@]}"; do
 done
 
 
-set +x 
-
-
 # Test retrieve data from Tilt
 testfn=TiltHydrometerTest.py
 testdir=$( find "$BREWOMETER_BASE" -name $testfn -printf '%h' )
-echo
-echo "Running test connection to tilt:"
+echo "Testing connection to tilt (as user $BREWPI_USER):"
 ( cd $testdir; sudo -u $BREWPI_USER python $testfn )
+
+set +x 
 
 echo
 echo "Be sure to edit the Tilt calibration files for each colour Tilt you own..."
-find "$BREWPI_HOME" -name 'TEMPERATURE*' | grep -v colour
-find "$BREWPI_HOME" -name 'GRAVITY*' | grep -v colour
+for color in "${TILT_COLORS[@]}"; do
+    for fn in $( find "$BREWPI_HOME" -name "*.$color" ); do
+        echo $fn
+        cat $fn
+    done
+    echo
+done
 
