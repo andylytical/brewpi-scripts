@@ -97,6 +97,11 @@ done
 # Test retrieve data from Tilt
 testfn=TiltHydrometerTest.py
 testdir=$( find "$BREWOMETER_BASE" -name $testfn -printf '%h' )
+# fix test to run only a few times
+orig=$testdir/$testfn
+copy=$testdir/${testfn}.copy
+cp $orig $copy
+sed -e '/for num in range(1,120):/c\for num in range(1,5):' $copy > $orig
 echo "Testing connection to tilt (as user $BREWPI_USER):"
 ( cd $testdir; sudo -u $BREWPI_USER python $testfn )
 
