@@ -1,16 +1,21 @@
 # Building a new brewpi from scratch
+
+NOTE: Assume logged in as `pi` user and current working dir is `/home/pi`.
+
 ## Install Raspbian image on SD card
 1. Download Raspbian Jessie Lite (https://www.raspberrypi.org/downloads/raspbian/)
 1. Copy image onto SD card
-   * (Windows) Win32DiskImager
+   * (Windows) Win32DiskImager (https://sourceforge.net/projects/win32diskimager/)
 
 ## Initialize OS
-1. Expand SD
+1. Login as `pi`
 1. sudo raspi-config
+   * Expand Filesystem
+   * Change user password
    * Set timezone (International / Localization)
-   * Change hostname
-   * Change password
-   * Enable ssh (Advanced options)
+   * Set hostname
+   * Enable ssh (Advanced options) (Optional: needed only if logging in remotely)
+1. Reboot
 1. Update OS
    * sudo aptitude update && sudo aptitude -y full-upgrade && sudo aptitude clean
 

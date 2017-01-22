@@ -1,14 +1,25 @@
 #!/bin/bash
 
 DEBUG=1
-BASE=/tmp/tilt-install
-BREWOMETER_BASE=$BASE/brewpi-brewometer
-BREWOMETER_URL=https://github.com/sibowler/brewpi-brewometer.git
-REQUIRED_PGKS=( bluez python-bluez python-scipy python-numpy libcap2-bin )
+
+# Adjust these for the tilt colors you have
+TILT_COLORS=( red )
+
+# Adjust these based on your answers to the brewpi-tools installer
+# The values here are the defaults from brewpi-tools installer for Raspbian Jessie
 WEBDIR=/var/www/html
 BREWPI_HOME=/home/brewpi
 BREWPI_USER=brewpi
-TILT_COLORS=( red )
+
+#
+# End of user configurable settings
+# (shouldn't need to change anything below here)
+#
+
+BASE=/tmp/tilt-install
+BREWOMETER_BASE=$BASE/brewpi-brewometer
+BREWOMETER_URL=https://github.com/sibowler/brewpi-brewometer.git
+REQUIRED_PKGS=( bluez python-bluez python-scipy python-numpy libcap2-bin )
 
 
 function die() {
@@ -44,6 +55,9 @@ function copy_files() {
 [[ $(id -u) -eq 0 ]] || die "Run this script as root"
 
 
+[[ $DEBUG -eq 1 ]] && set -x
+
+
 # Ensure required packages
 aptitude -q -y update
 aptitude -q -y install "${REQUIRED_PKGS[@]}" || die "required packages"
@@ -52,9 +66,6 @@ aptitude -q -y install "${REQUIRED_PKGS[@]}" || die "required packages"
 # Enable python to read socket
 pyexe=$( readlink -f $( which python ) )
 setcap cap_net_raw+eip "$pyexe" || die "setcap"
-
-
-[[ $DEBUG -eq 1 ]] && set -x
 
 
 # Get repo if not already local
