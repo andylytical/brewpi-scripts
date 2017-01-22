@@ -17,12 +17,13 @@ NOTE: Assume logged in as `pi` user and current working dir is `/home/pi`.
    * Enable ssh (Advanced options) (Optional: needed only if logging in remotely)
 1. Reboot
 1. Update OS
-   * sudo aptitude update && sudo aptitude -y full-upgrade && sudo aptitude clean
+   * ```sudo aptitude update && sudo aptitude -y full-upgrade && sudo aptitude clean```
+   * ```sudo reboot```
 
 ## Brewpi Software Setup
-1. sudo aptitude -y install git
-1. git clone https://github.com/andylytical/brewpi-scripts.git
-1. sudo brewpi-scripts/brewpi_install.sh
+1. ```sudo aptitude -y install git```
+1. ```git clone https://github.com/andylytical/brewpi-scripts.git```
+1. ```sudo brewpi-scripts/brewpi_install.sh```
 
 ## Tilt Hydrometer Setup
-1. sudo brewpi-scripts/tilt_install.sh
+1. ```sudo brewpi-scripts/tilt_install.sh```
