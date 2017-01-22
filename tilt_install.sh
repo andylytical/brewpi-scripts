@@ -1,7 +1,5 @@
 #!/bin/bash
 
-DEBUG=1
-
 # Adjust these for the tilt colors you have
 TILT_COLORS=( red )
 
@@ -11,81 +9,70 @@ WEBDIR=/var/www/html
 BREWPI_HOME=/home/brewpi
 BREWPI_USER=brewpi
 
-#
+###
 # End of user configurable settings
 # (shouldn't need to change anything below here)
-#
+###
 
 BASE=/tmp/tilt-install
 BREWOMETER_BASE=$BASE/brewpi-brewometer
 BREWOMETER_URL=https://github.com/sibowler/brewpi-brewometer.git
 REQUIRED_PKGS=( bluez python-bluez python-scipy python-numpy libcap2-bin )
+MAXAGE=86400
 
+#DEBUG=1
 
-function die() {
-  echo "FATAL ERROR: $*" >&2
-  exit 1
+fn=brewpi-scripts/bash.common
+[[ -r $fn ]] || { echo "Cant access file '$fn'"; exit 1
 }
-
-
-###
-#  Recursively sync files from SRCDIR to TGTDIR
-#  Perform a chown on each file changed in TGTDIR
-###
-function copy_files() {
-    tmpfn=$( mktemp )
-    [[ $DEBUG -eq 1 ]] && set -x
-    srcdir="$1"
-    tgtdir="$2"
-    #get owner:group of tgtdir
-    usr_grp=$( stat -c '%u:%g' "$tgtdir" )
-    rsync -rvic "$srcdir/" "$tgtdir/" \
-    | awk '/^[>c]/ {print substr($0,13);}' \
-    | tee $tmpfn \
-    | xargs -I{} chown $usr_grp "$tgtdir/{}"
-    [[ $DEBUG -eq 1 ]] && { 
-        echo "Copied the following files to '$tgtdir':"
-        cat $tmpfn
-    }
-    rm -f $tmpfn
-}
+source $fn
 
 
 # Expect this script to run as root
-[[ $(id -u) -eq 0 ]] || die "Run this script as root"
+assert_root || die "Run this script as root"
 
 
 [[ $DEBUG -eq 1 ]] && set -x
 
 
 # Ensure required packages
-aptitude -q -y update
-aptitude -q -y install "${REQUIRED_PKGS[@]}" || die "required packages"
+apt_update
+echo -n 'Installing required pkgs... '
+apt-get -yqq install "${REQUIRED_PKGS[@]}" || die 'required packages'
+echo 'OK'
 
 
 # Needed for parse_brewpi_json
-pip install tabulate
+echo -n 'Installing python tabulate... '
+pip install tabulate || die 'install python tabulate'
+echo 'OK'
 
 
-# Enable python to read socket
+echo -n 'Enabling python read socket... '
 pyexe=$( readlink -f $( which python ) )
-setcap cap_net_raw+eip "$pyexe" || die "setcap"
+setcap cap_net_raw+eip "$pyexe" || die 'setcap'
+echo 'OK'
 
 
-# Get repo if not already local
-[[ -d $BREWOMETER_BASE ]] || \
-git clone $BREWOMETER_URL $BREWOMETER_BASE || die "git clone"
+echo -n 'Get brewometer code... '
+is_recent $BREWOMETER_BASE $MAXAGE \
+|| git clone $BREWOMETER_URL $BREWOMETER_BASE \
+|| die "git clone"
+echo 'OK'
 
 
-# Copy brewpi-web files
+echo -n 'Installing tilt web files... '
 copy_files $BREWOMETER_BASE/brewpi-web $WEBDIR
+echo 'OK'
 
 
-# Copy brewpi-script files
+echo -n 'Installing tilt brewpi files... '
 copy_files $BREWOMETER_BASE/brewpi-script $BREWPI_HOME
+echo 'OK'
 
 
 # Setup Tilt calibration files
+echo -n 'Installing (default) tilt calibration files... '
 tiltdir=$( 
     find $BREWPI_HOME -type f -name 'TEMPERATURE.colour' -printf '%h' \
     | head -1 )
@@ -96,12 +83,13 @@ for color in "${TILT_COLORS[@]}"; do
         [[ -f $fn ]] || grep '^[0-9]' $src_fn > $tgt_fn
     done
 done
+echo 'OK'
 
 
-# Test retrieve data from Tilt
+# Test tilt connectivity
 testfn=TiltHydrometerTest.py
 testdir=$( find "$BREWOMETER_BASE" -name $testfn -printf '%h' )
-# fix test to run only a few times
+# HACKTHIS - fix test to run only a few times
 orig=$testdir/$testfn
 copy=$testdir/${testfn}.copy
 cp $orig $copy
@@ -111,6 +99,7 @@ echo "Testing connection to tilt (as user $BREWPI_USER):"
 
 set +x 
 
+echo
 echo
 echo "Be sure to edit the Tilt calibration files for each colour Tilt you own..."
 for color in "${TILT_COLORS[@]}"; do

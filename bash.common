@@ -1,0 +1,79 @@
+#!/bin/bash
+
+# Don't re-run installs or downloads unless MINAGE seconds have passed since last time
+MAXAGE=604800
+
+TS_NOW=$( date '+%s' )
+
+
+function die() {
+    echo "FATAL ERROR: $*" >&2
+    exit 1
+}
+
+
+###
+# If path exists and mtime is less than maxage, return 0
+# Otherwise, return 1
+# PARAMS:
+# 1. path   - path to dir or file
+# 2. maxage - maximum age in secs to be considered recent
+###
+function is_recent() {
+    [[ $DEBUG -eq 1 ]] && set -x
+    local path=$1
+    local maxage=$2
+    local rv=1
+    local age
+    if [[ -e $path ]] ; then
+        ts=$( stat -c '%Y' $path )
+        let "age = $TS_NOW - $ts"
+        if [[ $age -lt $maxage ]] ; then
+            rv=0
+        fi
+    fi
+  return $rv
+}
+
+
+###
+#  Return 0 if current user is root, return 1 otherwise
+###
+function assert_root() {
+    [[ $(id -u) -eq 0 ]]
+}
+
+
+
+###
+#  Recursively sync files from SRCDIR to TGTDIR
+#  Perform a chown on each file changed in TGTDIR
+###
+function copy_files() {
+    [[ $DEBUG -eq 1 ]] && set -x
+    local tmpfn=$( mktemp )
+    local srcdir="$1"
+    local tgtdir="$2"
+    local usr_grp=$( stat -c '%u:%g' "$tgtdir" )
+    rsync -rvic "$srcdir/" "$tgtdir/" \
+    | awk '/^[>c]/ {print substr($0,13);}' \
+    | tee $tmpfn \
+    | xargs -I{} chown $usr_grp "$tgtdir/{}"
+    [[ $DEBUG -eq 1 ]] && { 
+        echo "Copied the following files to '$tgtdir':"
+        cat $tmpfn
+    }
+    rm -f $tmpfn
+}
+
+
+###
+#  Update apt libraries if they are older than one day
+#  If apt libraries are younger than one day, do nothing
+###
+function apt_update() {
+    [[ $DEBUG -eq 1 ]] && set -x
+    is_recent '/var/lib/apt/lists' 86400 \
+    || apt-get -yqq update
+}
+
