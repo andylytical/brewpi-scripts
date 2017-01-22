@@ -63,6 +63,10 @@ aptitude -q -y update
 aptitude -q -y install "${REQUIRED_PKGS[@]}" || die "required packages"
 
 
+# Needed for parse_brewpi_json
+pip install tabulate
+
+
 # Enable python to read socket
 pyexe=$( readlink -f $( which python ) )
 setcap cap_net_raw+eip "$pyexe" || die "setcap"
