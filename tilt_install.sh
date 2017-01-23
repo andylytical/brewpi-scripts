@@ -74,12 +74,12 @@ is_recent $BREWOMETER_BASE $MAXAGE \
 echo 'OK'
 
 echo -n 'Installing tilt web files... '
-copy_files $BREWOMETER_BASE/brewpi-web $WEBDIR
+copy_files $BREWOMETER_BASE/brewpi-web $WEBDIR || die 'install tilt web files'
 echo 'OK'
 
 
 echo -n 'Installing tilt brewpi files... '
-copy_files $BREWOMETER_BASE/brewpi-script $BREWPI_HOME
+copy_files $BREWOMETER_BASE/brewpi-script $BREWPI_HOME || die 'install tile brewpi files'
 echo 'OK'
 
 
