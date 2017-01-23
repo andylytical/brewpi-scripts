@@ -21,6 +21,7 @@ REQUIRED_PKGS=( bluez python-bluez python-scipy python-numpy libcap2-bin )
 MAXAGE=86400
 
 #DEBUG=1
+FORCE=1
 
 fn=brewpi-scripts/bash.common
 [[ -r $fn ]] || { echo "Cant access file '$fn'"; exit 1
@@ -55,11 +56,13 @@ echo 'OK'
 
 
 echo -n 'Get brewometer code... '
+[[ $FORCE -eq 1 ]] && find $BREWOMETER_BASE -delete
 is_recent $BREWOMETER_BASE $MAXAGE \
 || git clone $BREWOMETER_URL $BREWOMETER_BASE \
 || die "git clone"
 echo 'OK'
 
+exit 1
 
 echo -n 'Installing tilt web files... '
 copy_files $BREWOMETER_BASE/brewpi-web $WEBDIR
