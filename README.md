@@ -17,11 +17,11 @@ NOTE: Assume logged in as `pi` user and current working dir is `/home/pi`.
    * Enable ssh (Advanced options) (Optional: needed only if logging in remotely)
 1. Reboot
 1. Update OS
-   * ```sudo aptitude update && sudo aptitude -y full-upgrade && sudo aptitude clean```
+   * ```sudo apt-get update && sudo apt-get -y full-upgrade && sudo apt-get clean```
    * ```sudo reboot```
 
 ## Brewpi Software Setup
-1. ```sudo aptitude -y install git```
+1. ```sudo apt-get -y install git```
 1. ```git clone https://github.com/andylytical/brewpi-scripts.git```
 1. ```sudo brewpi-scripts/brewpi_install.sh```
 
