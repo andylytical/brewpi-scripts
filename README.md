@@ -8,8 +8,8 @@ NOTE: Assume logged in as `pi` user and current working dir is `/home/pi`.
    * (Windows) Win32DiskImager (https://sourceforge.net/projects/win32diskimager/)
 
 ## Initialize OS
-1. Login as `pi`
-1. sudo raspi-config
+1. Login as `pi` (default password is `raspberry`)
+1. ```sudo raspi-config```
    * Expand Filesystem
    * Change user password
    * Set timezone (International / Localization)
