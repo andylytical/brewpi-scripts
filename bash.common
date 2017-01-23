@@ -51,23 +51,13 @@ function assert_root() {
 ###
 function copy_files() {
     [[ $DEBUG -eq 1 ]] && set -x
-#    local tmpfn=$( mktemp )
     local srcdir="$1"
     local tgtdir="$2"
     local usr_grp=$( stat -c '%u:%g' "$tgtdir" )
     chown -R $usr_grp $srcdir/
-    local force=''
-    [[ $FORCE -eq 1 ]] && force='-f'
-    cp -R --preserve=ownership $force "$srcdir/" "$tgtdir/"
-#    rsync -rvic "$srcdir/" "$tgtdir/" \
-#    | awk '/^[>c]/ {print substr($0,13);}' \
-#    | tee $tmpfn \
-#    | xargs -I{} chown $usr_grp "$tgtdir/{}"
-#    [[ $DEBUG -eq 1 ]] && { 
-#        echo "Copied the following files to '$tgtdir':"
-#        cat $tmpfn
-#    }
-#    rm -f $tmpfn
+    local rsync_verbose=''
+    [[ $VERBOSE -eq 1 ]] && rsync_verbose='-v'
+    rsync -rog $rsync_verbose "$srcdir/" "$tgtdir/"
     # Verify copied files are identical
     diff_verbose='-q'
     [[ $VERBOSE -eq 1 ]] && diff_verbose='-s'
