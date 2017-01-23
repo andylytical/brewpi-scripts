@@ -17,7 +17,7 @@ NOTE: Assume logged in as `pi` user and current working dir is `/home/pi`.
    * Enable ssh (Advanced options) (Optional: needed only if logging in remotely)
 1. Reboot
 1. Update OS
-   * ```sudo apt-get update && sudo apt-get -y full-upgrade && sudo apt-get clean```
+   * ```sudo apt-get update && sudo apt-get -y dist-upgrade && sudo apt-get clean```
    * ```sudo reboot```
 
 ## Brewpi Software Setup
