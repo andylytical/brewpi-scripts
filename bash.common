@@ -51,19 +51,31 @@ function assert_root() {
 ###
 function copy_files() {
     [[ $DEBUG -eq 1 ]] && set -x
-    local tmpfn=$( mktemp )
+#    local tmpfn=$( mktemp )
     local srcdir="$1"
     local tgtdir="$2"
     local usr_grp=$( stat -c '%u:%g' "$tgtdir" )
-    rsync -rvic "$srcdir/" "$tgtdir/" \
-    | awk '/^[>c]/ {print substr($0,13);}' \
-    | tee $tmpfn \
-    | xargs -I{} chown $usr_grp "$tgtdir/{}"
-    [[ $DEBUG -eq 1 ]] && { 
-        echo "Copied the following files to '$tgtdir':"
-        cat $tmpfn
-    }
-    rm -f $tmpfn
+    chown -R $usr_grp $srcdir/
+    local force=''
+    [[ $FORCE -eq 1 ]] && force='-f'
+    cp -R --preserve=ownership $force "$srcdir/" "$tgtdir/"
+#    rsync -rvic "$srcdir/" "$tgtdir/" \
+#    | awk '/^[>c]/ {print substr($0,13);}' \
+#    | tee $tmpfn \
+#    | xargs -I{} chown $usr_grp "$tgtdir/{}"
+#    [[ $DEBUG -eq 1 ]] && { 
+#        echo "Copied the following files to '$tgtdir':"
+#        cat $tmpfn
+#    }
+#    rm -f $tmpfn
+    # Verify copied files are identical
+    diff_verbose='-q'
+    [[ $VERBOSE -eq 1 ]] && diff_verbose='-s'
+    find "$srcdir" -type f \
+    | while read; do
+        tgt_fn=$tgtdir/${REPLY#$srcdir/} 
+        diff $diff_verbose $REPLY $tgt_fn || die "Copied file mismatch: $REPLY $tgt_fn"
+    done
 }
 
 
