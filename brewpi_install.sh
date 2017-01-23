@@ -6,14 +6,20 @@ BREWPI_URL=https://github.com/BrewPi/brewpi-tools.git
 BREWPI_INSTALL_LOG=install.log #this is always in the local dir
 MAXAGE=604800
 
-#DEBUG=1
-
 fn=brewpi-scripts/bash.common
 [[ -r $fn ]] || { echo "Cant access file '$fn'"; exit 1
 }
 source $fn
 
-[[ $DEBUG -gt 0 ]] && set -x
+
+# Process cmdline options
+DEBUG=0
+while getopts ":fd" opt; do
+    case $opt in
+        d) DEBUG=1 ;;
+    esac
+done
+[[ $DEBUG -eq 1 ]] && set -x
 
 
 # Expect this script to run as root

@@ -20,9 +20,8 @@ BREWOMETER_URL=https://github.com/sibowler/brewpi-brewometer.git
 REQUIRED_PKGS=( bluez python-bluez python-scipy python-numpy libcap2-bin )
 MAXAGE=86400
 
-#DEBUG=1
-FORCE=1
 
+# Import common functions
 fn=brewpi-scripts/bash.common
 [[ -r $fn ]] || { echo "Cant access file '$fn'"; exit 1
 }
@@ -33,6 +32,18 @@ source $fn
 assert_root || die "Run this script as root"
 
 
+FORCE=0
+DEBUG=0
+VERBOSE=0
+# Process cmdline options
+while getopts ":fvd" opt; do
+    case $opt in
+        f) FORCE=1 ;;
+        v) VERBOSE=1 ;;
+        d) DEBUG=1 ;;
+    esac
+done
+shift $((OPTIND-1))
 [[ $DEBUG -eq 1 ]] && set -x
 
 
@@ -62,8 +73,6 @@ is_recent $BREWOMETER_BASE $MAXAGE \
 || die "git clone"
 echo 'OK'
 
-exit 1
-
 echo -n 'Installing tilt web files... '
 copy_files $BREWOMETER_BASE/brewpi-web $WEBDIR
 echo 'OK'
@@ -88,6 +97,7 @@ for color in "${TILT_COLORS[@]}"; do
 done
 echo 'OK'
 
+exit 1
 
 # Test tilt connectivity
 testfn=TiltHydrometerTest.py
