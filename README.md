@@ -13,7 +13,7 @@ NOTE: Assume logged in as `pi` user and current working dir is `/home/pi`.
    * Expand Filesystem
    * Change user password
    * Set timezone (International / Localization)
-   * Set hostname
+   * Set hostname (Advanced options)
    * Enable ssh (Advanced options) (Optional: needed only if logging in remotely)
 1. Reboot
 1. Update OS
