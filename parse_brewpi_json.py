@@ -8,7 +8,7 @@ import tabulate
 
 
 def get_json_file():
-    dir='/var/www/html'
+    dir='/var/www/html/data'
     json_list = []
     for root, dirs, files in os.walk( dir ):
         for f in files:
