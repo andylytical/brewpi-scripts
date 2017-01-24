@@ -19,6 +19,7 @@ def get_json_file():
 
 
 jfile = get_json_file()
+print( "\n{0}\n".format( os.path.basename( jfile ) ) )
 
 with open( jfile ) as fh:
     data = json.load( fh )
@@ -44,4 +45,4 @@ for row in data['rows']:
     #datalist = [ row['c'][i]['v'] for i in col_nums ]
     rows.append( values )
 
-print tabulate.tabulate( rows, headers=headers )
+print( tabulate.tabulate( rows, headers=headers ) )
