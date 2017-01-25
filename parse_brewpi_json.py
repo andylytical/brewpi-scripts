@@ -18,13 +18,36 @@ def get_json_file():
     return sorted_list[-1]
 
 
+###
+#  Remove columns of data in which there is no value present in any row
+#  PARAMS:
+#    rows - list of lists, assume first row is headers
+#           Note: headers are excluded from checking for empty values, 
+#                 but will be filtered based on data from the remaining rows
+###
+def filter_empty_cols( rows ):
+    cols_with_data = []
+    for ary in rows[1:]:
+        for i, elem in enumerate( ary ):
+            if elem is not None:
+                cols_with_data.append( i )
+    valid_cols = set( sorted( cols_with_data ) )
+    cleanrows = []
+    for ary in rows:
+        newrow = []
+        for i in valid_cols:
+            newrow.append( ary[i] )
+        cleanrows.append( newrow )
+    return cleanrows
+
+
 jfile = get_json_file()
 print( "\n{0}\n".format( os.path.basename( jfile ) ) )
 
 with open( jfile ) as fh:
     data = json.load( fh )
 
-rex = re.compile( 'Time|BeerTemp|FridgeTemp|RoomTemp|RedTemp|RedSG' )
+rex = re.compile( 'Time|Temp|SG' )
 col_nums = []
 for k,v in enumerate( data[ 'cols' ] ):
     name = v['id']
@@ -42,7 +65,8 @@ for row in data['rows']:
         if elem is not None:
             val = elem['v']
         values.append( val )
-    #datalist = [ row['c'][i]['v'] for i in col_nums ]
     rows.append( values )
 
-print( tabulate.tabulate( rows, headers=headers ) )
+filtered_rows = filter_empty_cols( [ headers ] + rows )
+
+print( tabulate.tabulate( filtered_rows, headers="firstrow" ) )
