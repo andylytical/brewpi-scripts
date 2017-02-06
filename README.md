@@ -1,6 +1,7 @@
 # Building a new brewpi from scratch
 
-NOTE: Assume logged in as `pi` user and current working dir is `/home/pi`.
+Note 1: Assume logged in as `pi` user and current working dir is `/home/pi`.
+Note 2: Tested on Raspberry Pi 3 running "Raspbian GNU/Linux 8 (jessie)", Spark Photon V2, and Tilt model LBM313-2540-256
 
 ## Install Raspbian image on SD card
 1. Download Raspbian Jessie Lite (https://www.raspberrypi.org/downloads/raspbian/)
