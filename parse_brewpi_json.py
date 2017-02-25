@@ -47,7 +47,7 @@ print( "\n{0}\n".format( os.path.basename( jfile ) ) )
 with open( jfile ) as fh:
     data = json.load( fh )
 
-rex = re.compile( 'Time|Temp|SG|Set' )
+rex = re.compile( 'Time|Temp|SG' )
 col_nums = []
 for k,v in enumerate( data[ 'cols' ] ):
     name = v['id']
