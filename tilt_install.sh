@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# TODO - Pass in tilt colors, temp and gravity calibrations on cmdline
+# TODO   or in a file
+# TODO - Automate hack to remove tilt temp from graph
+
 # Adjust these for the tilt colors you have
 TILT_COLORS=( red )
 
