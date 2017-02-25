@@ -1,6 +1,7 @@
 # Building a new brewpi from scratch
 
 Note 1: Assume logged in as `pi` user and current working dir is `/home/pi`.
+
 Note 2: Tested on Raspberry Pi 3 running "Raspbian GNU/Linux 8 (jessie)", Spark Photon V2, and Tilt model LBM313-2540-256
 
 ## Install Raspbian image on SD card
@@ -27,3 +28,5 @@ Note 2: Tested on Raspberry Pi 3 running "Raspbian GNU/Linux 8 (jessie)", Spark 
 
 ## Tilt Hydrometer Setup
 1. ```sudo brewpi-scripts/tilt_install.sh```
+1. Edit calibration files GRAVITY.colour and TEMPERATURE.colour (as directed by the output of the script above).
+1. In brewpi web interface, start a new brew.
