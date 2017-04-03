@@ -9,20 +9,21 @@ import subprocess
 import shutil
 
 
-WWWDIR = '/var/www/html/data'
+WWWDIR = pathlib.Path( '/var/www/html/data' )
 HOME = os.environ['HOME']
 DBUL = str( pathlib.Path( HOME ).joinpath( 'Dropbox-Uploader', 'dropbox_uploader.sh' ) )
 
 def backup_beer_logs():
-    for localdir in get_beerdirs():
-        remotedir = pathlib.Path( safe_filename( '/' + localdir.name ) )
-        sync_dir_to_DB( localdir, remotedir )
+#    for localdir in get_beerdirs():
+#        remotedir = pathlib.Path( safe_filename( '/' + localdir.name ) )
+#        sync_dir_to_DB( localdir, remotedir )
+    sync_dir_to_DB( WWWDIR, pathlib.Path( '/' ) )
 
 
-def get_beerdirs():
-    rv = []
-    basedir = pathlib.Path( WWWDIR )
-    return [ x for x in basedir.iterdir() if x.is_dir() ]
+#def get_beerdirs():
+#    rv = []
+#    basedir = pathlib.Path( WWWDIR )
+#    return [ x for x in basedir.iterdir() if x.is_dir() ]
 
 
 def safe_filename( rawfn ):
@@ -85,7 +86,7 @@ def sync_dir_to_DB( src, tgt, base=None ):
         if p.is_file():
             logging.debug( 'Found localfile: {}'.format( p ) )
             # construct equivalent target
-            start = len( base.parts ) - 1
+            start = len( base.parts )
             new_path = '/' + '/'.join( p.parts[ start : ] )
             remote_p = pathlib.Path( safe_filename( new_path ) )
             logging.debug( 'Remote filepath: {}'.format( pprint.pformat( remote_p ) ) )
@@ -108,6 +109,7 @@ def sync_dir_to_DB( src, tgt, base=None ):
                 sync_file_to_DB( p, remote_p )
     for d in dirs:
         #TODO : implement and test recursion for entire tree
+        # sync_dir_to_DB( d, tgt.joinpath( d.name ), base=base )
         logging.warning( 'Recursion into dirs not complete, skipping {}'.format( d ) )
 
 def sync_file_to_DB( src, tgt ):
