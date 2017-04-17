@@ -1,0 +1,75 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>BrewPi BrewLog Data for ___{BEERNAME}</title>
+    <link type="text/css" href="css/style.css" rel="stylesheet"/>
+    <link type="text/css" href="css/tiltHydrometer.css" rel="stylesheet"/>
+</head>
+<body>
+    <div id="beer-panel" class="ui-widget ui-widget-content ui-corner-all">
+
+        <!-- START beer-panel.php -->
+        <div id="top-bar" class="ui-widget ui-widget-header ui-corner-all">
+            <div id="lcd" class="lcddisplay">
+                <span class="lcd-text">
+                    <span class="lcd-line" id="lcd-line-0">BrewPi</span>
+                    <span class="lcd-line" id="lcd-line-1">Brewlog for </span>
+                    <span class="lcd-line" id="lcd-line-2">___{BEERNAME}</span>
+                    <span class="lcd-line" id="lcd-line-3"></span>
+                </span>
+            </div>
+            <div id="logo-container">
+                <img src="brewpi_logo.png">
+                <div id=beer-name-container>
+                <span>___{BEERNAME}</span>
+                <span class="data-logging-state"></span>
+            </div>
+        </div>
+    </div>
+    <div class="chart-container">
+        <div id="curr-beer-chart" class="beer-chart" style="width:815px; height:390px"></div>
+        <div id="curr-beer-chart-label" class="beer-chart-label"></div>
+        <div id="curr-beer-chart-controls" class="beer-chart-controls" style="display: none">
+        <!-- 
+        <div id="curr-beer-chart-controls" class="beer-chart-controls">
+        -->
+            <!-- div id="curr-beer-chart-buttons" -->
+            <div id="curr-beer-chart-legend" class="beer-chart-legend">
+                <div class="beer-chart-legend-row time">
+                    <div class="beer-chart-legend-time">Date/Time</div>
+                </div>
+
+                ___{BEERCHARTLEGEND}
+
+            </div> <!-- END div id="curr-beer-chart-legend" -->
+        </div> <!-- END div id="curr-beer-chart-controls" -->
+    </div> <!-- END div class="chart-container" -->
+    <!-- END beer-panel.php -->
+
+    <!-- Load scripts after the body, so they don't block rendering of the page -->
+    <script type="text/javascript" src="js/dygraph-combined.js"></script>
+    <script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript">
+        // pass parameters to JavaScript
+        window.tempFormat = 'C';
+        window.beerName = "___{BEERNAME}";
+        window.dateTimeFormat = "yy-mm-dd";
+        window.dateTimeFormatDisplay = "dd/mm/yy";
+
+        // Settings and functions from beer-chart.js
+        var tempFormatr = function(y) {
+            return parseFloat(y).toFixed(2) + "\u00B0 " + window.tempFormat;
+        };
+        var gravityFormat = function(y) {
+            return parseFloat(y).toFixed(3);
+        };
+        var $chartDiv = $('#curr-beer-chart');
+        var $chartContainer = $chartDiv.parent();
+
+        ___{BEERCHART}
+
+        $('#curr-beer-chart-label').show();
+    </script>
+</body>
+</html>
