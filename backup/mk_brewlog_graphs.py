@@ -4,52 +4,22 @@ import pathlib
 import json
 import re
 import datetime
+import string
+import urllib
+import pprint
+import os
+import textwrap
 
-#import tabulate
-#import pprint
+# Only grab data for columns matching this regular expression
+COLS_REGEX = re.compile( 'Time|BeerTemp|BeerSet|SG' )
 
-#DATADIR = pathlib.Path( '.' )
+HOME = pathlib.Path( os.environ['HOME'] )
 DATADIR = pathlib.Path( '/var/www/html/data' )
-COLS_REGEX = re.compile( 'Time|Temp|Set|SG' )
+HTML_TEMPLATE = HOME/'brewpi-scripts/backup/brewlog.html.tmpl'
 
 
-def html_start( title ):
-    return '''
-<html> <head>
-<title>
-''' + title + '''
-</title>
-<script type="text/javascript" src="dygraph.min.js"></script>
-<link rel="stylesheet" src="dygraph.min.css" />
-<style>
-  #graphdiv {
-    width: 640px;
-    height: 480px;
-    display: inline-block;
-    vertical-align: top;
-  }
-  #legend {
-    display: inline-block;
-    vertical-align: top;
-  }
-</style>
-</head>
-<body> <h3>
-''' + title + '''
-</h3>
-<div id="graphdiv"></div>
-<div id="legend"></div>
-<script type="text/javascript">
-var tempFormat = function(y) {
-    return parseFloat(y).toFixed(2);
-};
-var gravityFormat = function(y) {
-    return parseFloat(y).toFixed(3);
-};
-'''
-
-def html_end():
-    return '</script> </body> </html>'
+class myTemplate( string.Template ):
+    delimiter = '___'
 
 
 class jscode( object ):
@@ -63,6 +33,19 @@ class jscode( object ):
         return str( self.line )
 
     __repr__ = __str__
+
+
+def safe_filename( rawfn ):
+    return urllib.parse.unquote_plus( rawfn )
+
+
+def mk_lcdparts( src ):
+    fmt = '{:^22}'
+    lcdtext = 'BrewPi brewlog for {}'.format( src )
+    lcdparts = [''] * 4
+    for i,v in enumerate( textwrap.wrap( lcdtext, width=22, max_lines=4 ) ):
+        lcdparts[i] = fmt.format( v )
+    return lcdparts
 
 
 def get_jsonfiles():
@@ -112,25 +95,25 @@ def py2js( val ):
 def filter_empty_cols( data ):
     ''' Remove columns of data in which there is no value present in any row.
         PARAMS:
-            data - dict - of the form { 'headers': list,
-                                        'rows': list of lists 
+            data - dict - of the form { 'labels': list,
+                                        'values': list of lists 
                                       }
         RETURN:
             cleandata - dict with same format as above but with empty cols removed
-        Note: headers are excluded from checking for empty values,
-              but will be filtered based on data from the remaining rows
+        Note: labels are excluded from checking for empty values,
+              but will be filtered based on data from the remaining values (rows)
     '''
     cols_with_data = []
-    for ary in data[ 'rows' ]:
+    for ary in data[ 'values' ]:
         for i, elem in enumerate( ary ):
             if elem is not None:
                 cols_with_data.append( i )
     valid_cols = set( sorted( cols_with_data ) )
-    cleanhdrs = [ data[ 'headers' ][ i ] for i in valid_cols ]
+    cleanhdrs = [ data[ 'labels' ][ i ] for i in valid_cols ]
     cleanrows = []
-    for ary in data[ 'rows' ]:
+    for ary in data[ 'values' ]:
         cleanrows.append( [ ary[i] for i in valid_cols ] )
-    return { 'headers': cleanhdrs, 'rows': cleanrows }
+    return { 'labels': cleanhdrs, 'values': cleanrows }
 
 
 
@@ -138,7 +121,7 @@ def parse_jsonfile( jpath ):
     with jpath.open() as fp:
         data = json.load( fp )
     col_nums = [ k for k,v in enumerate( data['cols'] ) if COLS_REGEX.search( v['id'] ) ]
-    headers = [ data[ 'cols' ][ i ][ 'id' ] for i in col_nums ]
+    labels = [ data[ 'cols' ][ i ][ 'id' ] for i in col_nums ]
     rows = []
     for row in data[ 'rows' ]:
         values = []
@@ -147,33 +130,31 @@ def parse_jsonfile( jpath ):
             typ = data[ 'cols' ][ i ][ 'type' ]
             values.append( j2py( elem, typ ) )
         rows.append( values )
-    return ( headers, rows )
+    return ( labels, rows )
 
 def parse_jsondata( jsonlist ):
     ''' jsonlist is a dict where key=brewdir and val=list of json filepaths
-        Returns list of rows, first row is headers, remaining rows are data
+        Returns a dict where key=brewdir and val=list of lists where
+        val[0] = list of labels, and remaining elements are lists of values
     '''
     brewdata = {}
     for brewdir, filelist in jsonlist.items():
-        thisdata = { 'rows': [] }
+        thisdata = { 'values': [] }
         for jsonfile in sorted( filelist ):
-#            print( f'Processing {jsonfile}' )
             hdrs, rows = parse_jsonfile( jsonfile )
-            if 'headers' not in thisdata:
-                thisdata[ 'headers' ] = hdrs
-            if len( hdrs ) != len( thisdata[ 'headers' ] ):
-                raise UserWarning( "mismatched headers in file: '{jsonfile}'" )
-                raise UserWarning( "mismatched headers in file: '{}'".format( jsonfile ) )
-#            print( f'Num rows: {len(rows)}' )
-            thisdata[ 'rows' ].extend( rows )
+            if 'labels' not in thisdata:
+                thisdata[ 'labels' ] = hdrs
+            if len( hdrs ) != len( thisdata[ 'labels' ] ):
+                raise UserWarning( "mismatched labels in file: '{}'".format( jsonfile ) )
+            thisdata[ 'values' ].extend( rows )
         cleandata = filter_empty_cols( thisdata )
         brewdata[ brewdir ] = cleandata
     return brewdata
 
 
 def mk_dygraph( data ):
-    ''' data formated as: { 'headers': [...], 
-                            'rows': [ [...], [...], ...  ] }
+    ''' data formated as: { 'labels': [...], 
+                            'values': [ [...], [...], ...  ] }
     '''
     color_map = { 'BeerTemp': 'rgb(41, 170, 41)',   #green
                   'BeerSet': 'rgb(240, 100, 100)',  #pink?
@@ -203,9 +184,9 @@ def mk_dygraph( data ):
     series_opts = { k: SG_details for k in SG_labels }
     opts = {
         'legend': 'always',
-        'labels': data[ 'headers' ],
-        'colors': [ color_map[ k ] for k in data[ 'headers' ][ 1: ] ],
-        'labelsDiv': jscode( "document.getElementById('legend')" ),
+        'labels': data[ 'labels' ],
+        'colors': [ color_map[ k ] for k in data[ 'labels' ][ 1: ] ],
+        'labelsDiv': jscode( "document.getElementById('curr-beer-chart-controls')" ),
         'labelsSeparateLines': jscode( 'true' ),
         'series': series_opts,
         'ylabel': 'Temperature',
@@ -219,33 +200,40 @@ def mk_dygraph( data ):
                   },
         },
     }
-    return '{}, {}, {} {}'.format(
-        jscode( 'new Dygraph( document.getElementById("graphdiv")' ),
-        data[ 'rows' ],
-        opts,
+    return '{},\n{},\n{}\n{}'.format(
+        jscode( 'var beerChart = new Dygraph( document.getElementById("curr-beer-chart")' ),
+        data[ 'values' ],
+        pprint.pformat( opts ),
         jscode( ');' ) )
 
 
-def mk_html( title, data, outfile ):
+def mk_html( template_data, outfile ):
+    with HTML_TEMPLATE.open() as infile:
+        doc = infile.read()
+    tmpl = myTemplate( doc )
     print( 'Writing file: {}'.format( outfile ) )
-    with open( outfile.as_posix(), 'w' ) as fh:
-        fh.writelines( [ html_start( title ), 
-                         mk_dygraph( data ), 
-                         html_end(),
-                       ] )
+    with outfile.open( mode='w' ) as fh:
+        fh.write( tmpl.substitute( template_data ) )
 
 
 def run():
     jsonlist = get_jsonfiles()
     brewdata = parse_jsondata( jsonlist )
     for dir, data in brewdata.items():
-        print( 'Brewdir: '.format( dir ) )
-#        print( tabulate.tabulate( data['rows'][0:10], headers=data['headers'] ) )
-        #outfn = dir.parent.joinpath( dir.name ).with_suffix( '.html' )
-        outfn = dir.parent.joinpath( dir.name ).with_suffix( '.html' )
+        print( 'Brewdir: {}'.format( dir ) )
+        beername = safe_filename( dir.name )
+        outfn = dir.parent.joinpath( beername ).with_suffix( '.html' )
         # convert python types to javascript where needed
         data = py2js( data )
-        mk_html( dir.name, data, outfn )
+        lcdparts = mk_lcdparts( beername )
+        template_data = { 'BEERNAME': beername,
+                          'LCD0': lcdparts[0],
+                          'LCD1': lcdparts[1],
+                          'LCD2': lcdparts[2],
+                          'LCD3': lcdparts[3],
+                          'BEERCHART': mk_dygraph( data ),
+                        }
+        mk_html( template_data, outfn )
 
 
 

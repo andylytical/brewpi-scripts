@@ -1,5 +1,8 @@
 #!/usr/bin/python3
 
+#TODO - Replace Dropbox-Uploader with DropBox Official Python API
+#       https://www.dropbox.com/developers/documentation/python
+
 import logging
 import pprint
 import pathlib
@@ -9,21 +12,18 @@ import subprocess
 import shutil
 
 
-WWWDIR = pathlib.Path( '/var/www/html/data' )
-HOME = os.environ['HOME']
-DBUL = str( pathlib.Path( HOME ).joinpath( 'Dropbox-Uploader', 'dropbox_uploader.sh' ) )
+
+WWW = pathlib.Path( '/var/www/html' )
+HOME = pathlib.Path( os.environ['HOME'] )
+DBUL = str( HOME/'Dropbox-Uploader/dropbox_uploader.sh' )
 
 def backup_beer_logs():
-#    for localdir in get_beerdirs():
-#        remotedir = pathlib.Path( safe_filename( '/' + localdir.name ) )
-#        sync_dir_to_DB( localdir, remotedir )
-    sync_dir_to_DB( WWWDIR, pathlib.Path( '/' ) )
-
-
-#def get_beerdirs():
-#    rv = []
-#    basedir = pathlib.Path( WWWDIR )
-#    return [ x for x in basedir.iterdir() if x.is_dir() ]
+    tgtbase = pathlib.Path( '/' )
+    sync_dir_to_DB( WWW/'data', tgtbase )
+    sync_dir_to_DB( WWW/'css', tgtbase/'css', base=WWW )
+    sync_dir_to_DB( WWW/'js', tgtbase/'js', base=WWW )
+    sync_dir_to_DB( WWW/'font', tgtbase/'font', base=WWW )
+    sync_file_to_DB( WWW/'brewpi_logo.png', tgtbase/'brewpi_logo.png' )
 
 
 def safe_filename( rawfn ):
@@ -65,18 +65,19 @@ def DB_list_or_make_dir( safepath ):
             parts = line.split( maxsplit=2 )
             key = 'FILES'
             size = int( parts[1] )
-        path = pathlib.Path( safepath / parts[-1] )
+        path = pathlib.Path( safepath ) / parts[-1]
         contents[ key ][ path ] = size
     return contents
 
 
 def sync_dir_to_DB( src, tgt, base=None ):
-    remote_contents = DB_list_or_make_dir( tgt )
+    safe_tgt = pathlib.Path( safe_filename( str( tgt ) ) )
+    remote_contents = DB_list_or_make_dir( safe_tgt )
     logging.debug( 'Remote Contents:\n{}'.format( pprint.pformat( remote_contents ) ) )
     if not base:
         base = src
     dirs = []
-    # for each local file
+    # cycle through local dir contents, check they exist on the remote side
     for p in src.iterdir():
         if p.is_dir():
             # save dirs for later recursing
@@ -108,16 +109,14 @@ def sync_dir_to_DB( src, tgt, base=None ):
             if target_needs_update:
                 sync_file_to_DB( p, remote_p )
     for d in dirs:
-        #TODO : implement and test recursion for entire tree
-        # sync_dir_to_DB( d, tgt.joinpath( d.name ), base=base )
-        logging.warning( 'Recursion into dirs not complete, skipping {}'.format( d ) )
+        sync_dir_to_DB( d, tgt / d.name, base=base )
 
 def sync_file_to_DB( src, tgt ):
     logging.info( '\n{} >>>> {}'.format( src, tgt ) )
     # Have to copy src file to a safename that dropbox uploader can work with
-    tmp = pathlib.Path( '/tmp/brewpibkuptmpfnhardlink' )
+    tmp = pathlib.Path( '/tmp/brewpibkuptmpfn' )
     logging.debug( 'tmp: {}'.format( tmp ) )
-    shutil.copy( str( src), str( tmp ) )
+    shutil.copy( str( src ), str( tmp ) )
     runcmd( DBUL, args=[ '-q', 'upload', tmp, tgt ] )
 
 
