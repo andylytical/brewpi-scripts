@@ -1,5 +1,8 @@
 #!/usr/bin/python3
 
+#TODO - Replace Dropbox-Uploader with DropBox Official Python API
+#       https://www.dropbox.com/developers/documentation/python
+
 import logging
 import pprint
 import pathlib
@@ -21,7 +24,6 @@ def backup_beer_logs():
     sync_dir_to_DB( WWW/'js', tgtbase/'js', base=WWW )
     sync_dir_to_DB( WWW/'font', tgtbase/'font', base=WWW )
     sync_file_to_DB( WWW/'brewpi_logo.png', tgtbase/'brewpi_logo.png' )
-#    sync_file_to_DB( HOME/'brewpi-scripts/backup/brewlog.js', tgtbase/'brewlog.js' )
 
 
 def safe_filename( rawfn ):
@@ -107,9 +109,7 @@ def sync_dir_to_DB( src, tgt, base=None ):
             if target_needs_update:
                 sync_file_to_DB( p, remote_p )
     for d in dirs:
-        #TODO : implement and test recursion for entire tree
         sync_dir_to_DB( d, tgt / d.name, base=base )
-        #logging.warning( 'Recursion into dirs not complete, skipping {}'.format( d ) )
 
 def sync_file_to_DB( src, tgt ):
     logging.info( '\n{} >>>> {}'.format( src, tgt ) )
