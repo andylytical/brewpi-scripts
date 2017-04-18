@@ -11,6 +11,7 @@ import os
 import textwrap
 
 # Only grab data for columns matching this regular expression
+#COLS_REGEX = re.compile( 'Time|Temp|Set|SG' )
 COLS_REGEX = re.compile( 'Time|BeerTemp|BeerSet|SG' )
 
 HOME = pathlib.Path( os.environ['HOME'] )
@@ -89,7 +90,6 @@ def py2js( val ):
         return jscode( 'null' )
     else:
         return val
-        #raise UserWarning( f'Unhandled type for {val}' )
 
 
 def filter_empty_cols( data ):
@@ -149,7 +149,6 @@ def parse_jsondata( jsonlist ):
             thisdata[ 'values' ].extend( rows )
         cleandata = filter_empty_cols( thisdata )
         brewdata[ brewdir ] = cleandata
-#        brewdata[ brewdir ] = thisdata
     return brewdata
 
 
@@ -157,7 +156,28 @@ def mk_dygraph( data ):
     ''' data formated as: { 'labels': [...], 
                             'values': [ [...], [...], ...  ] }
     '''
-    global COLOR_MAP
+    COLOR_MAP = { 'BeerTemp': 'rgb(41, 170, 41)',   #green
+                  'BeerSet': 'rgb(240, 100, 100)',  #pink?
+                  'FridgeTemp': 'rgb(89, 184, 255)', #light blue
+                  'FridgeSet': 'rgb(255, 161, 76)',  #orange
+                  'RoomTemp': 'rgb(128,128,128)',     #grey
+                  'RedTemp': 'red',
+                  'RedSG': 'red',
+                  'GreenTemp': 'lime',
+                  'GreenSG': 'lime',
+                  'BlackTemp': 'black',
+                  'BlackSG': 'black',
+                  'PurpleTemp': 'purple',
+                  'PurpleSG': 'purple',
+                  'OrangeTemp': 'orange',
+                  'OrangeSG': 'orange',
+                  'BlueTemp': 'darkblue',
+                  'BlueSG': 'darkblue',
+                  'YellowTemp': 'yellow',
+                  'YellowSG': 'yellow',
+                  'PinkTemp':  'orchid',
+                  'PinkSG': 'orchid',
+                }
     SG_details = { 'axis': 'y2', 'strokePattern': [ 7, 3 ] }
     SG_labels = [ 'RedSG', 'GreenSG', 'PurpleSG', 'BlackSG', 
                   'OrangeSG', 'BlueSG', 'YellowSG', 'PinkSG' ]
@@ -165,17 +185,17 @@ def mk_dygraph( data ):
     opts = {
         'legend': 'always',
         'labels': data[ 'labels' ],
-        'colors': [ color_map[ k ] for k in data[ 'labels' ][ 1: ] ],
+        'colors': [ COLOR_MAP[ k ] for k in data[ 'labels' ][ 1: ] ],
         'labelsDiv': jscode( "document.getElementById('curr-beer-chart-controls')" ),
         'labelsSeparateLines': jscode( 'true' ),
         'series': series_opts,
         'ylabel': jscode( "'Temperature (' + window.tempFormat + ')'" ),
         'y2label': 'Gravity (SG)',
         'axes': { 
-#            'y': { 'valueFormatter': jscode( 'tempFormatr' ),
-#                 },
+            'y': { 'valueFormatter': jscode( 'tempFormat' ),
+                 },
             'y2': { 'valueRange': [ 0.990, jscode( 'null' ) ],
-#                    'valueFormatter': jscode( 'gravityFormat' ),
+                    'valueFormatter': jscode( 'gravityFormat' ),
                     'axisLabelFormatter': jscode( 'gravityFormat' ),
                   },
         },
@@ -185,10 +205,6 @@ def mk_dygraph( data ):
             'strokeBorderWidth': 1,
             'highlightCircleSize': 5,
         },
-#        'highlightCallback': 
-#            jscode( 'function(e, x, pts, row) { showChartLegend(e, x, pts, row, beerChart); }' ),
-#        'unhighlightCallback': 
-#            jscode( 'function(e) { hideChartLegend(); }' ),
     }
     return '{},\n{},\n{}\n{}'.format(
         jscode( 'var beerChart = new Dygraph( document.getElementById("curr-beer-chart")' ),
@@ -224,7 +240,6 @@ def run():
                           'BEERCHART': mk_dygraph( data ),
                         }
         mk_html( template_data, outfn )
-
 
 
 if __name__ == '__main__':
