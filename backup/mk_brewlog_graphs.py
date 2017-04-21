@@ -11,8 +11,8 @@ import os
 import textwrap
 
 # Only grab data for columns matching this regular expression
-#COLS_REGEX = re.compile( 'Time|Temp|Set|SG' )
-COLS_REGEX = re.compile( 'Time|BeerTemp|BeerSet|SG' )
+COLS_REGEX = re.compile( 'Time|Temp|Set|SG' )
+#COLS_REGEX = re.compile( 'Time|BeerTemp|BeerSet|SG' )
 
 HOME = pathlib.Path( os.environ['HOME'] )
 DATADIR = pathlib.Path( '/var/www/html/data' )
@@ -189,7 +189,7 @@ def mk_dygraph( data ):
         'labelsDiv': jscode( "document.getElementById('curr-beer-chart-controls')" ),
         'labelsSeparateLines': jscode( 'true' ),
         'series': series_opts,
-        'ylabel': jscode( "'Temperature (' + window.tempFormat + ')'" ),
+        'ylabel': 'Temperature (C)',
         'y2label': 'Gravity (SG)',
         'axes': { 
             'y': { 'valueFormatter': jscode( 'tempFormat' ),
