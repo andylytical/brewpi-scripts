@@ -1,9 +1,11 @@
 # Brewpi Scripts
 There are two parts to this repository:
-1. (mostly) Automated (re-)build of RaspberryPi with BrewPi code and TiltHydrometer additions.
+1. Automated install of BrewPi code and TiltHydrometer additions.
 1. Backup of brewlog data & offline-brewlog graph viewing
 
-# Building a new brewpi from scratch
+
+----
+# Part 1 - Automated install of BrewPi and TiltHydrometer
 
 Note 1: Assume logged in as `pi` user and current working dir is `/home/pi`.
 
@@ -38,22 +40,22 @@ Photon V2, and Tilt model LBM313-2540-256
    the output of the script above).
 1. In brewpi web interface, start a new brew.
 
-# Backup of brewlog data & offline-brewlog graph viewing
-NOTE 1: Assume this github repo has already been cloned (per instructions above).
+----
 
-NOTE 2: Assume logged in as use `pi` with default home at `/home/pi` and
-default brewpi web dir at `/var/www/html`
-
-NOTE 3: Currently stores backups to Dropbox.
+# Part 2 - Backup brewlog data and create static HTML for viewing brewlog graph offline (from Dropbox)
+NOTES:
+1. Assume logged in as user `pi` with default home at `/home/pi` and default brewpi web dir at `/var/www/html`
 
 ## Dependencies
 * https://github.com/andreafabrizi/Dropbox-Uploader
+* Dropbox account
+  * A free account provides 2GB of space.  A single brew (about 1 month of data) uses approximately 20MB of space, which allows for up to 100 brews before some data would have to be *archived* to a different location.
 
 ## Installation
 1. Install Dropbox-Uploader
    1. Follow instructions at https://github.com/andreafabrizi/Dropbox-Uploader to **clone** the repo and configure access to Dropbox.
 1. Install local copies of updated Dygraphs libraries
-   1. `~/brewpi-scripts/backup/install.sh`
+   1. `/home/pi/brewpi-scripts/backup/install.sh`
 1. Create new cron job to run every 4 hours to generate new offline graphs and backup new data to Dropbox
    1. `crontab -e`
    ```
@@ -61,13 +63,13 @@ NOTE 3: Currently stores backups to Dropbox.
    12 */4 * * * python3 /home/pi/brewpi-scripts/backup/backup_brewlogs.py
    ```
 ## Verify installation
-### Manually generate offline brewlog graphs
+### Manually generate static HTML pages with brewlog graphs
 1. `python3 /home/pi/brewpi-scripts/backup/mk_brewlog_graphs.py`
 ### Force live backup of brewlog data
 1. `python3 /home/pi/brewpi-scripts/backup/backup_brewlogs.py`
 ### Verify brewlog backup graphs
 1. On your local computer, browse to dropbox sync folder
-1. Go to the folder you created in the first step of Installation above
-1. Double-click an HTML file from a current or previous brewlog
+1. Go to the folder you created in the first step of Installation above (ie: *configure access to Dropbox*)
+1. Double-click an HTML file from the current or a previous brewlog
 
 
