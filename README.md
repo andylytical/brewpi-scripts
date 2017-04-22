@@ -1,7 +1,7 @@
 # Brewpi Scripts
 There are two parts to this repository:
 1. Automated install of BrewPi code and TiltHydrometer additions.
-1. Backup of brewlog data & offline-brewlog graph viewing
+1. Backup of brewlog data & view brewlog graphs offline
 
 
 ----
@@ -42,7 +42,7 @@ Photon V2, and Tilt model LBM313-2540-256
 
 ----
 
-# Part 2 - Backup brewlog data and create static HTML for viewing brewlog graph offline (from Dropbox)
+# Part 2 - Backup brewlog data and create static HTML pages for viewing brewlog graphs offline (from Dropbox)
 NOTES:
 1. Assume logged in as user `pi` with default home at `/home/pi` and default brewpi web dir at `/var/www/html`
 
