@@ -72,4 +72,8 @@ NOTES:
 1. Go to the folder you created in the first step of Installation above (ie: *configure access to Dropbox*)
 1. Double-click an HTML file from the current or a previous brewlog
 
+## Sample backup brewlog graph (from generated static HTML file)
+![Sample Graph](https://cloud.githubusercontent.com/assets/7127884/25308073/ae624fd6-2772-11e7-8f51-1f3ba052a8b2.PNG)
+> Note: The pretty legends in the live brewpi display are quite complex and embedded with other functions not needed for a backup graph and so, for this version, I opted to use the native dygraphs legends.  It's not as pretty but it's fast and gets the job done.
 
+> Note: My brewpi does not log the temperature reported by the tilt so it is not shown on the graph above.
