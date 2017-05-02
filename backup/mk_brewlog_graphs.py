@@ -50,15 +50,24 @@ def mk_lcdparts( src ):
 
 
 def get_jsonfiles():
-    ''' Return a dict where key=brewdir and val=list of json filepaths
+    ''' Return a dict with format 
+        { <BREWDIR>: { 
+                       'JSONFILES': [ /brewdir/file1.json, /brewdir/file2.json, ... ],
+                       'LAST_UPDATE': datetime.datetime,
+                     },
+          ...
+        }
     '''
     data = {}
     for p in DATADIR.iterdir():
         if p.is_dir() and p.name != 'profiles':
-            data[ p ] = []
+            data[ p ] = { 'JSONFILES': [], 'LAST_UPDATE': datetime.datetime.min, }
             for f in p.iterdir():
                 if f.is_file() and f.suffix == '.json':
-                    data[ p ].append( f )
+                    data[ p ][ 'JSONFILES' ].append( f )
+                    mtime = datetime.datetime.fromtimestamp( f.stat().st_mtime )
+                    if mtime > data[ p ][ 'LAST_UPDATE' ]:
+                        data[ p ][ 'LAST_UPDATE' ] = mtime
     return data
 
 
@@ -132,24 +141,26 @@ def parse_jsonfile( jpath ):
         rows.append( values )
     return ( labels, rows )
 
+
 def parse_jsondata( jsonlist ):
-    ''' jsonlist is a dict where key=brewdir and val=list of json filepaths
-        Returns a dict where key=brewdir and val=list of lists where
-        val[0] = list of labels, and remaining elements are lists of values
+    ''' jsonlist is a list of json filepaths
+        Returns a dict with format:
+            { 'labels': [ ... ],
+              'values': [ [...], [...], ... ],
+            }
+        INPUT:
+            jsonlist - list of pathlib.Path's to json files
     '''
-    brewdata = {}
-    for brewdir, filelist in jsonlist.items():
-        thisdata = { 'values': [] }
-        for jsonfile in sorted( filelist ):
-            hdrs, rows = parse_jsonfile( jsonfile )
-            if 'labels' not in thisdata:
-                thisdata[ 'labels' ] = hdrs
-            if len( hdrs ) != len( thisdata[ 'labels' ] ):
-                raise UserWarning( "mismatched labels in file: '{}'".format( jsonfile ) )
-            thisdata[ 'values' ].extend( rows )
-        cleandata = filter_empty_cols( thisdata )
-        brewdata[ brewdir ] = cleandata
-    return brewdata
+    thisdata = { 'values': [] }
+    for jsonfile in sorted( jsonlist ):
+        hdrs, rows = parse_jsonfile( jsonfile )
+        if 'labels' not in thisdata:
+            thisdata[ 'labels' ] = hdrs
+        if len( hdrs ) != len( thisdata[ 'labels' ] ):
+            raise UserWarning( "mismatched labels in file: '{}'".format( jsonfile ) )
+        thisdata[ 'values' ].extend( rows )
+    cleandata = filter_empty_cols( thisdata )
+    return cleandata
 
 
 def mk_dygraph( data ):
@@ -224,20 +235,28 @@ def mk_html( template_data, outfile ):
 
 def run():
     jsonlist = get_jsonfiles()
-    brewdata = parse_jsondata( jsonlist )
-    for dir, data in brewdata.items():
+    for dir, jsondata in jsonlist.items():
+        combined_json = parse_jsondata( jsondata[ 'JSONFILES' ] )
         print( 'Brewdir: {}'.format( dir ) )
         beername = safe_filename( dir.name )
         outfn = dir.parent.joinpath( beername ).with_suffix( '.html' )
+        # only create html if there is new json data
+        html_mtime = datetime.datetime.min
+        if outfn.exists():
+            html_mtime = datetime.datetime.fromtimestamp( outfn.stat().st_mtime )
+        if jsondata[ 'LAST_UPDATE' ] <= html_mtime:
+            # No new changes to json data, dont create new html file
+            print( 'No changes, skipping' )
+            continue
         # convert python types to javascript where needed
-        data = py2js( data )
+        combined_json = py2js( combined_json )
         lcdparts = mk_lcdparts( beername )
         template_data = { 'BEERNAME': beername,
                           'LCD0': lcdparts[0],
                           'LCD1': lcdparts[1],
                           'LCD2': lcdparts[2],
                           'LCD3': lcdparts[3],
-                          'BEERCHART': mk_dygraph( data ),
+                          'BEERCHART': mk_dygraph( combined_json ),
                         }
         mk_html( template_data, outfn )
 
