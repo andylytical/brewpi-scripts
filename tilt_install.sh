@@ -101,8 +101,6 @@ for color in "${TILT_COLORS[@]}"; do
 done
 echo 'OK'
 
-exit 1
-
 # Test tilt connectivity
 testfn=TiltHydrometerTest.py
 testdir=$( find "$BREWOMETER_BASE" -name $testfn -printf '%h' )
