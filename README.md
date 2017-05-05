@@ -1,5 +1,7 @@
 # Brewpi Scripts
-Useful scripts for automated setup of brewpi and tiltHydrometer
+Automated setup of brewpi and tiltHydrometer
+
+**NOTE**: The brewlog backup code has been moved to it's own repo at: https://github.com/andylytical/brewpi-backup
 
 # Automated install of BrewPi and TiltHydrometer
 
