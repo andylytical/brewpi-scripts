@@ -31,6 +31,9 @@ NOTES:
 1. ```sudo apt-get -y install git```
 1. ```git clone https://github.com/andylytical/brewpi-scripts.git```
 1. ```sudo brewpi-scripts/brewpi_install.sh```
+   * Default response can be accepted for all questions except:
+      * `Web directory is NOT empty, are you SURE you want to use this path? [y/N] y`
+      * for which you will have to answer `y` (since the default is no)
 
 ## Tilt Hydrometer Setup
 1. ```sudo brewpi-scripts/tilt_install.sh```
