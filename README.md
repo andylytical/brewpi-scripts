@@ -16,13 +16,14 @@ NOTES:
 
 ## Initialize OS
 1. Login as `pi` (default password is `raspberry`)
-1. ```sudo raspi-config```
-   * Expand Filesystem
+1. `sudo raspi-config`
    * Change user password
-   * Set timezone (International / Localization)
-   * Set hostname (Advanced options)
-   * Enable ssh (Advanced options) (Optional: needed only if logging in remotely)
+   * Set hostname
+   * Set timezone
+   * Expand filesystem
+   * Enable SSH (Optional: needed only if logging in remotely)
 1. Reboot
+   * `sudo reboot`
 1. Update OS
    * ```sudo apt-get update && sudo apt-get -y dist-upgrade && sudo apt-get clean && sudo reboot```
 
