@@ -76,6 +76,6 @@ function copy_files() {
 function apt_update() {
     [[ $DEBUG -eq 1 ]] && set -x
     is_recent '/var/lib/apt/lists' 86400 \
-    || apt-get -yqq update
+    || apt -yqq update
 }
 

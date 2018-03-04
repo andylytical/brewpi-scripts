@@ -54,7 +54,7 @@ shift $((OPTIND-1))
 # Ensure required packages
 apt_update
 echo -n 'Installing required pkgs... '
-apt-get -yqq install "${REQUIRED_PKGS[@]}" || die 'required packages'
+apt -yqq install "${REQUIRED_PKGS[@]}" || die 'required packages'
 echo 'OK'
 
 

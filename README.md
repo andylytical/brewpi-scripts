@@ -27,10 +27,10 @@ NOTES:
 1. Reboot
    * `sudo reboot`
 1. Update OS
-   * ```sudo apt-get update && sudo apt-get -y dist-upgrade && sudo apt-get clean && sudo reboot```
+   * ```sudo apt update && sudo apt -y dist-upgrade && sudo apt clean && sudo reboot```
 
 ## Brewpi Software Setup
-1. ```sudo apt-get -y install git```
+1. ```sudo apt -y install git```
 1. ```git clone https://github.com/andylytical/brewpi-scripts.git```
 1. ```sudo brewpi-scripts/brewpi_install.sh```
    * Default response can be accepted for all questions except:
