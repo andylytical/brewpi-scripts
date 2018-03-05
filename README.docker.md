@@ -6,7 +6,7 @@ https://blog.alexellis.io/getting-started-with-docker-on-raspberry-pi/
 1. Install Raspbian Stretch \
    https://www.raspberrypi.org/downloads/
 
-1. Reduce gpu memory
+1. Reduce gpu memory (optional)
    ```bash
    grep gpu_mem /boot/config.txt || echo "gpu_mem=16" >> /boot/config.txt
    ```
@@ -19,32 +19,19 @@ https://blog.alexellis.io/getting-started-with-docker-on-raspberry-pi/
    ```
 
 ## Setup docker
-1. Install docker
-   ```bash
-   curl -sSL https://get.docker.com | sh
-   ```
+1. `git clone https://github.com/andylytical/brewpi-scripts.git`
+1. `cd brewpi-scripts`
+1. `git submodule update --init`
+1. `sudo docker_install.sh`
 
-1.  Add pi user to docker group
-   ```bash
-   sudo usermod -aG docker pi
-   ```
 
-1. Enable docker at startup
-   ```bash
-   systemctl enable docker
-   ```
-
-1. Start docker
-   ```bash
-   systemctl start docker
-   ```
-
-1. Get latest brewpi docker image
+# Enure latest brewpi docker image
    ```bash
    docker pull brewpi/brewpi-raspbian
    ```
 
 # Start up initial brewpi docker container
+This will create `~/brewpi-data`
 ```bash
 docker run --rm -it \
 --name brewpi \

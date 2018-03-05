@@ -78,4 +78,3 @@ function apt_update() {
     is_recent '/var/lib/apt/lists' 86400 \
     || apt -yqq update
 }
-
