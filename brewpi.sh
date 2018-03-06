@@ -114,7 +114,7 @@ function check_update() {
 
 
 function usage() {
-    CMDS=( status start stop restart mkdatadir clean )
+    CMDS=( status start stop restart check-update update mkdatadir clean )
     cat <<ENDHERE
 Usage: $0 CMD
 where CMD is one of: ${CMDS[@]}
