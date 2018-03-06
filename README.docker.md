@@ -1,8 +1,8 @@
 Borrowed heavily from
 https://blog.alexellis.io/getting-started-with-docker-on-raspberry-pi/
 
-# Setup RPi
-## Setup OS
+# One Time Setup
+## OS
 1. Install Raspbian Stretch \
    https://www.raspberrypi.org/downloads/
 
@@ -18,45 +18,18 @@ https://blog.alexellis.io/getting-started-with-docker-on-raspberry-pi/
    apt update && apt -y install "${PACKAGES[@]}" && apt -y full-upgrade && reboot
    ```
 
-## Setup docker
+## Docker
 1. `git clone https://github.com/andylytical/brewpi-scripts.git`
 1. `cd brewpi-scripts`
 1. `git submodule update --init`
-1. `sudo docker_install.sh`
+1. `./docker_install.sh`
+1. `docker pull brewpi/brewpi-raspbian`
 
 
-# Enure latest brewpi docker image
-   ```bash
-   docker pull brewpi/brewpi-raspbian
-   ```
+## Setup Wifi Access To Spark
+OPTIONAL - Skip this step if using spark via USB
 
-# Start up initial brewpi docker container
-This will create `~/brewpi-data`
-```bash
-docker run --rm -it \
---name brewpi \
--p 80:80 \
--v ~/brewpi-data:/data \
--v /etc/timezone:/etc/timezone \
--v /etc/localtime:/etc/localtime \
-brewpi/brewpi-raspbian bash
-```
-
-# Start up brewpi docker container
-```bash
-docker run -d \
---name brewpi \
--p 80:80 \
--v ~/brewpi-data:/data \
--v /etc/timezone:/etc/timezone \
--v /etc/localtime:/etc/localtime \
---restart always \
-brewpi/brewpi-raspbian
-```
-
-
-
-# Setup wifi on the Brewpi Spark
+#### Setup wifi on ths spark
 See also:
 * https://docs.particle.io/guide/tools-and-features/cli/photon/
 
@@ -74,7 +47,39 @@ See also:
    ```
 
 1. Get MAC address \
-   Type: `m`
+   Type: `m` \
+   If necessary, add this mac to your wifi router mac filter to allow access
 
 1. Setup wifi \
-   Type: `w`
+   Type: `w` \
+   Enter information as prompted for SSID and password
+
+
+#### Configure brewpi to spark access
+1. Start docker container to create `~/brewpi-data`, then exit immediately
+   ```bash
+   /home/pi/brewpi-scripts/dbp mkdata
+   ```
+```bash
+docker run --rm -it \
+--name brewpi \
+-p 80:80 \
+-v ~/brewpi-data:/data \
+-v /etc/timezone:/etc/timezone \
+-v /etc/localtime:/etc/localtime \
+brewpi/brewpi-raspbian sleep 2
+```
+
+# Start up brewpi docker container
+```bash
+docker run -d \
+--name brewpi \
+-p 80:80 \
+-v ~/brewpi-data:/data \
+-v /etc/timezone:/etc/timezone \
+-v /etc/localtime:/etc/localtime \
+--restart always \
+brewpi/brewpi-raspbian
+```
+
+

@@ -5,12 +5,14 @@ MAXAGE=604800
 
 
 function ensure_docker() {
+    [[ $DEBUG -eq 1 ]] && set -x
     which docker &>/dev/null \
     || curl -sSL https://get.docker.com | sh
 }
 
 
 function configure_docker() {
+    [[ $DEBUG -eq 1 ]] && set -x
     id -nG pi | grep -q docker || {
         usermod -aG docker pi
         systemctl enable docker
@@ -19,13 +21,14 @@ function configure_docker() {
 
 
 function start_docker() {
+    [[ $DEBUG -eq 1 ]] && set -x
     systemctl start docker
 }
 
 
 ### Process cmdline options
 DEBUG=0
-while getopts ":fd" opt; do
+while getopts ":d" opt; do
     case $opt in
         d) DEBUG=1 ;;
     esac
@@ -46,21 +49,4 @@ assert_root || die "Run this script as root"
 try ensure_docker
 ensure_docker || die "Failed at step: ensure_docker"
 
-configure_docker || die "Failed
-
-
-## Ensure latest brewpi codebase
-#is_recent $BREWPI_BASE $MAXAGE || {
-#    find $BREWPI_BASE -delete 2>/dev/null
-#    git clone $BREWPI_URL $BREWPI_BASE
-#} || die "git clone brewpi-tools failed"
-#
-#
-## Install brewpi
-#is_recent $BREWPI_INSTALL_LOG $MAXAGE \
-#|| $BREWPI_BASE/install.sh \
-#|| die "brewpi install failed"
-#
-#
-## Update brewpi code and connected devices
-#$BREWPI_BASE/updater.py || die "brewpi update failed"
+configure_docker || die "Failed"
