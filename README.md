@@ -36,7 +36,7 @@ See: [One Time Setup](#one-time-setup)
 
 1. Reduce gpu memory (optional)
    ```bash
-   grep gpu_mem /boot/config.txt || sudo sed -ie '$agpu_mem=16' /boot/config.txt
+   grep -q gpu_mem /boot/config.txt || sudo sed -ie '$agpu_mem=16' /boot/config.txt
    ```
 
 1. Setup Networking
