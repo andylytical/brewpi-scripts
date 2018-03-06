@@ -1,3 +1,5 @@
+Automated install of brewpi and docker on Raspberry Pi.
+
 # Installation
 See: [One Time Setup](#one-time-setup)
 
