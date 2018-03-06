@@ -52,8 +52,9 @@ See: [One Time Setup](#one-time-setup)
 
 1. Updates
    ```bash
+   sudo su -
    PACKAGES=( git )
-   sudo apt update && apt -y install "${PACKAGES[@]}" && apt -y full-upgrade && reboot
+   apt update && apt -y install "${PACKAGES[@]}" && apt -y full-upgrade && reboot
    ```
 
 ## Docker
