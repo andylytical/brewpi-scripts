@@ -22,6 +22,13 @@ source $fn
 
 apt_update
 
+# Install additional packages
 sudo apt -yqq install "${__additional_pkgs[@]}"
+
+# Perform full OS update
 sudo apt -y full-upgrade
+
+# Minimize RAM dedicated to GPU
+grep -q gpu_mem /boot/config.txt || sudo sed -ie '$agpu_mem=16' /boot/config.txt
+
 sudo reboot
