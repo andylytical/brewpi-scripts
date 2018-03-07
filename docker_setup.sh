@@ -4,22 +4,22 @@
 function ensure_docker() {
     [[ $DEBUG -eq 1 ]] && set -x
     which docker &>/dev/null \
-    || curl -sSL https://get.docker.com | sh
+    || sudo 'curl -sSL https://get.docker.com | sh'
 }
 
 
 function configure_docker() {
     [[ $DEBUG -eq 1 ]] && set -x
     id -nG pi | grep -q docker || {
-        usermod -aG docker pi
-        systemctl enable docker
+        sudo usermod -aG docker pi
+        sudo systemctl enable docker
     }
 }
 
 
 function start_docker() {
     [[ $DEBUG -eq 1 ]] && set -x
-    systemctl start docker
+    sudo systemctl start docker
 }
 
 
@@ -39,9 +39,6 @@ fn="$(readlink -e ${BASH_SOURCE[$i]%/*})"/bash.common
 }
 source $fn
 
-
-### Expect this script to run as root
-assert_root || die "Run this script as root"
 
 ensure_docker || die "Failed at: ensure_docker"
 
