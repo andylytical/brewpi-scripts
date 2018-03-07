@@ -57,14 +57,17 @@ See: [One Time Setup](#one-time-setup)
 1. `git clone https://github.com/andylytical/brewpi-scripts.git`
 1. `ln -s /home/pi/brewpi-scripts/brewpi.sh ~/brewpi`
 
-## Docker
+## Finish OS setup
+1. `~/brewpi-scripts/os_setup.sh`
+
+## Docker setup
 1. `~/brewpi-scripts/docker_setup.sh`
 1. `~/brewpi update`
 
 ## Setup Wifi Access To Spark
 OPTIONAL - Skip this step if using spark via USB
 
-### Setup wifi on the spark
+### Configure wifi on the spark
 Note: These instructions were tested on a Spark version 3. \
 TODO: Test on Spark v2
 
