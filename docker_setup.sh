@@ -1,10 +1,15 @@
 #!/bin/bash
 
 
+__logout_msg=
+
+
 function ensure_docker() {
     [[ $DEBUG -eq 1 ]] && set -x
-    which docker &>/dev/null \
-    || sudo 'curl -sSL https://get.docker.com | sh'
+    which docker &>/dev/null || { 
+        curl -o /tmp/docker.install -sSL https://get.docker.com
+        sudo sh /tmp/docker.install
+    }
 }
 
 
@@ -13,6 +18,7 @@ function configure_docker() {
     id -nG pi | grep -q docker || {
         sudo usermod -aG docker pi
         sudo systemctl enable docker
+	__logout_msg="You must logout and login again for environment changes to take effect"
     }
 }
 
@@ -45,3 +51,5 @@ ensure_docker || die "Failed at: ensure_docker"
 configure_docker || die "Failed at: configure_docker"
 
 start_docker || die "Failed at: start_docker"
+
+echo "$__logout_msg"
