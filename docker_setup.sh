@@ -1,8 +1,5 @@
 #!/bin/bash
 
-BASE=/home/pi
-MAXAGE=604800
-
 
 function ensure_docker() {
     [[ $DEBUG -eq 1 ]] && set -x
@@ -37,7 +34,7 @@ done
 
 
 ### Source common functions
-fn=$BASE/brewpi-scripts/bash.common
+fn="$(readlink -e ${BASH_SOURCE[$i]%/*})"/bash.common
 [[ -r $fn ]] || { echo "Cant access file '$fn'" 1>&2; exit 1
 }
 source $fn
@@ -46,7 +43,8 @@ source $fn
 ### Expect this script to run as root
 assert_root || die "Run this script as root"
 
-try ensure_docker
-ensure_docker || die "Failed at step: ensure_docker"
+ensure_docker || die "Failed at: ensure_docker"
 
-configure_docker || die "Failed"
+configure_docker || die "Failed at: configure_docker"
+
+start_docker || die "Failed at: start_docker"

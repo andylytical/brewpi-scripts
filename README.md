@@ -60,7 +60,7 @@ See: [One Time Setup](#one-time-setup)
 ## Docker
 1. `git clone https://github.com/andylytical/brewpi-scripts.git`
 1. `ln -s /home/pi/brewpi-scripts/brewpi.sh ~/brewpi`
-1. `/home/pi/brewpi-scripts/docker_install.sh`
+1. `sudo /home/pi/brewpi-scripts/docker_setup.sh`
 1. `docker pull brewpi/brewpi-raspbian`
 
 
