@@ -1,6 +1,7 @@
 #!/bin/bash
 
 DATADIR=/home/pi/brewpi-data
+CONFIG="${DATADIR}/settings/config.cfg"
 CONTAINER=brewpi
 IMAGE=brewpi/brewpi-raspbian
 PRG=$( basename $0 )
@@ -38,13 +39,15 @@ function docker_start_old() {
 
 function docker_start_new() {
     [[ $DEBUG -eq 1 ]] && set -x
+    local _restart='--restart always'
+    [[ -n "$1" ]] && _restart=''
     docker run -d \
     --name $CONTAINER \
     -p 80:80 \
     -v ~/brewpi-data:/data \
     -v /etc/timezone:/etc/timezone \
     -v /etc/localtime:/etc/localtime \
-    --restart always \
+    $restart \
     brewpi/brewpi-raspbian $*
 }
 
@@ -113,8 +116,33 @@ function check_update() {
 }
 
 
+function disable_spark_usb() {
+    [[ $DEBUG -eq 1 ]] && set -x
+    sed -ie '/^port = auto/ s/^/# /' "$CONFIG"
+}
+
+function disable_spark_wifi() {
+    [[ $DEBUG -eq 1 ]] && set -x
+    sed -ie '/^port = socket/ s/^/# /' "$CONFIG"
+}
+
+function enable_spark_usb() {
+    [[ $DEBUG -eq 1 ]] && set -x
+    disable_spark_wifi
+    sed -ie '/^# port = auto/ s/^# //' "$CONFIG"
+}
+
+function enable_spark_wifi() {
+    [[ $DEBUG -eq 1 ]] && set -x
+    [[ $# -eq 1 ]] || die "Missing ip addr for enable_wifi"
+    local _ip="$1"
+    disable_spark_usb
+    sed -ie "/port = socket/cport = socket://${_ip}:6666" "$CONFIG"
+}
+
+
 function usage() {
-    CMDS=( status start stop restart check-update update mkdatadir clean )
+    CMDS=( status start stop restart check-update update mkdatadir enable-wifi enable-usb clean )
     cat <<ENDHERE
 Usage: $0 CMD
 where CMD is one of: ${CMDS[@]}
@@ -131,6 +159,13 @@ while getopts ":d" opt; do
 done
 shift $((OPTIND-1))
 [[ $DEBUG -eq 1 ]] && set -x
+
+### Source common functions
+_base="$(dirname "$(readlink -e ${BASH_SOURCE[$i]})" )"
+fn="${_base}/bash.common"
+[[ -r $fn ]] || { echo "Cant access file '$fn'" 1>&2; exit 1
+}
+source $fn
 
 
 action=$1
@@ -152,6 +187,15 @@ case $action in
         ;;
     mkdatadir)
         [[ -d $DATADIR ]] || docker_start sleep 1
+        sleep 1
+        docker_stop
+        docker_clean
+        ;;
+    enable-wifi)
+        enable_spark_wifi $*
+        ;;
+    enable-usb)
+        enable_spark_usb
         ;;
     clean)
         docker_clean

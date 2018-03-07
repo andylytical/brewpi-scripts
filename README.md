@@ -34,10 +34,16 @@ See: [One Time Setup](#one-time-setup)
 1. Install Raspbian Stretch \
    https://www.raspberrypi.org/downloads/
 
-1. Reduce gpu memory (optional)
-   ```bash
-   grep -q gpu_mem /boot/config.txt || sudo sed -ie '$agpu_mem=16' /boot/config.txt
-   ```
+1. Configure OS basics
+   1. `sudo raspi-config`
+      * Change user password
+      * Network - Set Hostname
+      * Network - Setup Wi-Fi
+      * Localization - Set timezone
+      * Localization - Set wifi country
+      * Enable SSH
+      * Expand filesystem
+      * Exit and reboot
 
 1. Setup Networking
    1. Get the mac from the pi
@@ -45,24 +51,15 @@ See: [One Time Setup](#one-time-setup)
       * Wireless: `cat /sys/class/net/wlan0/address`
    1. Use the mac to assign a static ip (on your router). \
       See your router documentation on how to do this.
-   1. Wifi setup only: \
-      Configure wifi on the pi
-      * `sudo raspi-config`
-      * Browse through options to find wifi setup
 
-1. Updates
-   ```bash
-   sudo su -
-   PACKAGES=( git )
-   apt update && apt -y install "${PACKAGES[@]}" && apt -y full-upgrade && reboot
-   ```
-
-## Docker
+## Install brewpi-scripts
+1. `sudo apt -y install git`
 1. `git clone https://github.com/andylytical/brewpi-scripts.git`
 1. `ln -s /home/pi/brewpi-scripts/brewpi.sh ~/brewpi`
-1. `sudo /home/pi/brewpi-scripts/docker_setup.sh`
-1. `docker pull brewpi/brewpi-raspbian`
 
+## Docker
+1. `~/brewpi-scripts/docker_setup.sh`
+1. `~/brewpi update`
 
 ## Setup Wifi Access To Spark
 OPTIONAL - Skip this step if using spark via USB
