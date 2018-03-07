@@ -1,6 +1,6 @@
 #!/bin/bash
 
-__additional_packages=( git less tree vim )
+__additional_pkgs=( git less tree vim )
 
 
 ### Process cmdline options
@@ -23,7 +23,7 @@ source $fn
 apt_update
 
 # Install additional packages
-sudo apt -yqq install "${__additional_pkgs[@]}"
+sudo apt -y install "${__additional_pkgs[@]}"
 
 # Perform full OS update
 sudo apt -y full-upgrade
