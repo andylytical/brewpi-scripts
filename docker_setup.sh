@@ -18,7 +18,9 @@ function configure_docker() {
     id -nG pi | grep -q docker || {
         sudo usermod -aG docker pi
         sudo systemctl enable docker
-	__logout_msg="You must logout and login again for environment changes to take effect"
+	__logout_msg="
+    
+    You must logout and login again for environment changes to take effect"
     }
 }
 
@@ -52,4 +54,4 @@ configure_docker || die "Failed at: configure_docker"
 
 start_docker || die "Failed at: start_docker"
 
-echo; echo; echo "$__logout_msg"
+echo "$__logout_msg"
