@@ -20,6 +20,7 @@ fn="$(readlink -e ${BASH_SOURCE[$i]%/*})"/bash.common
 source $fn
 
 
+echo "Downloading catalogs (this could take a few minutes)..."
 apt_update
 
 # Install additional packages
