@@ -52,4 +52,4 @@ configure_docker || die "Failed at: configure_docker"
 
 start_docker || die "Failed at: start_docker"
 
-echo "$__logout_msg"
+echo; echo; echo "$__logout_msg"
