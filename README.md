@@ -41,9 +41,9 @@ See: [One Time Setup](#one-time-setup)
       * Network - Setup Wi-Fi
       * Localization - Set timezone
       * Localization - Set wifi country
-      * Enable SSH
-      * Expand filesystem
-      * Exit and reboot
+      * Interfacing Options - Enable SSH
+      * Finish
+      * Reboot
 
 1. Setup Networking
    1. Get the mac from the pi
@@ -62,6 +62,8 @@ See: [One Time Setup](#one-time-setup)
 
 ## Docker setup
 1. `~/brewpi-scripts/docker_setup.sh`
+1. `logout`
+1. Login again as user __pi__
 1. `~/brewpi update`
 
 ## Setup Wifi Access To Spark
@@ -101,8 +103,8 @@ TODO: Test on Spark v2
 See also: https://docs.particle.io/guide/tools-and-features/cli/photon/
 
 ### Enable wifi access to spark
-1. `~/brewpi mkdatadir`
 1. `~/brewpi enable-wifi <SPARK_IP_ADDRESS>` \
     Replace the string _<SPARK_IP_ADDRESS>_ with the ip address you assigned
     to the Spark.
+1. `~/brewpi restart`
 
