@@ -55,6 +55,7 @@ See: [One Time Setup](#one-time-setup)
 ## Install brewpi-scripts
 1. `sudo apt -y install git`
 1. `git clone https://github.com/andylytical/brewpi-scripts.git`
+1. `cd brewpi-scripts; git checkout topic/aloftus/update_for_stretch_n_docker; cd`
 1. `ln -s /home/pi/brewpi-scripts/brewpi.sh ~/brewpi`
 
 ## Finish OS setup
