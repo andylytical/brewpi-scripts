@@ -118,18 +118,18 @@ function check_update() {
 
 function disable_spark_usb() {
     [[ $DEBUG -eq 1 ]] && set -x
-    sed -ie '/^port = auto/ s/^/# /' "$CONFIG"
+    sudo sed -ie '/^port = auto/ s/^/# /' "$CONFIG"
 }
 
 function disable_spark_wifi() {
     [[ $DEBUG -eq 1 ]] && set -x
-    sed -ie '/^port = socket/ s/^/# /' "$CONFIG"
+    sudo sed -ie '/^port = socket/ s/^/# /' "$CONFIG"
 }
 
 function enable_spark_usb() {
     [[ $DEBUG -eq 1 ]] && set -x
     disable_spark_wifi
-    sed -ie '/^# port = auto/ s/^# //' "$CONFIG"
+    sudo sed -ie '/^# port = auto/ s/^# //' "$CONFIG"
 }
 
 function enable_spark_wifi() {
@@ -137,7 +137,7 @@ function enable_spark_wifi() {
     [[ $# -eq 1 ]] || die "Missing ip addr for enable_wifi"
     local _ip="$1"
     disable_spark_usb
-    sed -ie "/port = socket/cport = socket://${_ip}:6666" "$CONFIG"
+    sudo sed -ie "/port = socket/cport = socket://${_ip}:6666" "$CONFIG"
 }
 
 
