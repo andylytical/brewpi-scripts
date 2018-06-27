@@ -1,6 +1,6 @@
 #!/bin/bash
 
-__additional_pkgs=( git less tree vim )
+__additional_pkgs=( git less tree vim jq )
 
 
 ### Process cmdline options
