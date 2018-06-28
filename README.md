@@ -1,5 +1,13 @@
 Automated install of brewpi and docker on Raspberry Pi.
 
+----
+Note: The latest version does not have tilt support (yet).
+For Tilt Hydrometer support, see [release v0.1](670ded92d556e19fda82ce0d76bd9391b5587a70)
+
+Note: [release v0.1](670ded92d556e19fda82ce0d76bd9391b5587a70) was tested on v0.4.4 of Brewpi code. It might work if applied to the v0.5.5 brewpi code *inside* the container, but that has not been tried or tested here.
+
+----
+
 # Installation
 See: [One Time Setup](#one-time-setup)
 
