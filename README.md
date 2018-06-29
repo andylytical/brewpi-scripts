@@ -88,7 +88,7 @@ TODO: Test on Spark v2
 
 1. Install screen
    ```bash
-   apt -y install screen
+   sudo apt -y install screen
    ```
 
 1. Connect to particle
