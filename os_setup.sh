@@ -27,7 +27,7 @@ apt_update
 sudo apt -y install "${__additional_pkgs[@]}"
 
 # Perform full OS update
-sudo apt -y full-upgrade
+sudo apt -y upgrade
 
 # Minimize RAM dedicated to GPU
 grep -q gpu_mem /boot/config.txt || sudo sed -ie '$agpu_mem=16' /boot/config.txt

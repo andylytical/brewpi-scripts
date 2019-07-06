@@ -40,7 +40,8 @@ See: [One Time Setup](#one-time-setup)
 
 ## OS
 1. Install Raspbian Stretch \
-   https://www.raspberrypi.org/downloads/
+   https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2019-04-09/2019-04-08-raspbian-stretch-lite.zip \
+   NOTE: As of 6 July 2019, *Raspbian Buster* is the latest version but does not have Docker support.
 
 1. Configure OS basics
    1. `sudo raspi-config`
@@ -48,7 +49,6 @@ See: [One Time Setup](#one-time-setup)
       * Network - Set Hostname
       * Network - Setup Wi-Fi
       * Localization - Set timezone
-      * Localization - Set wifi country
       * Interfacing Options - Enable SSH
       * Finish
       * Reboot
